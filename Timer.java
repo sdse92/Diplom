@@ -1,4 +1,6 @@
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.TimerTask;
 
 public class Timer {
@@ -30,7 +32,31 @@ public class Timer {
 
             System.out.println(getTimeFrom() + " " + getTimeTo());
             GetRequests get = new GetRequests();
-            get.Result(getTimeFrom(), getTimeTo());
+            get.requestResult("http://new.welcome-tracker.ru/api.php?api=71e5367021e4c6cf091f34434e5e9458&from="
+                    + getTimeFrom() +  "&to=" + getTimeTo());
+
+            int processCount = Runtime.getRuntime().availableProcessors();
+            List<Thread> threads = new ArrayList<>();
+            int threadCount;
+            if (get.numberOfClients() > processCount){ threadCount = processCount; }
+            else { threadCount = get.numberOfClients(); }
+
+            for (int i = 0; i < threadCount; i++){
+                threads.add(new Thread(new ThreadParser(get)));
+            }
+
+            for (int i = 0; i < threadCount; i++){
+                threads.get(i).start();
+            }
+
+            for (int i = 0; i < threadCount; i++) {
+                try {
+                    threads.get(i).join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
             SetRequests set = new SetRequests(get);
             set.createJSON();
             set.printJson();

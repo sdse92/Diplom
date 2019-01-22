@@ -3,14 +3,20 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
+//добавить поле roistat
 
 public class GetRequests {
 
-    private ArrayList<Client> clientsList = new ArrayList<>();
+    public ArrayList<Client> clientsList = new ArrayList<>();
+    BlockingQueue<String> clientsToParce;
+    List<String> listForQueue;
     Timer timer = new Timer();
 
-    public String getHTMLrequest(String urlToRead) {
+    private String getHTMLrequest(String urlToRead) {
         URL url;
         HttpURLConnection conn;
         BufferedReader rd;
@@ -28,39 +34,47 @@ public class GetRequests {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        result = result.replaceAll("\\[","").replaceAll("]","");
-        return result;
+        return result.replaceAll("\\[","").replaceAll("]","");
     }
 
-    public void Result(long timeFrom, long timeTo){
-//        String URL = "http://new.welcome-tracker.ru/api.php?api=71e5367021e4c6cf091f34434e5e9458&from="
-//                + timer.getTimeFrom() +  "&to=" + timer.getTimeTo();
-        String URL = "http://new.welcome-tracker.ru/api.php?api=71e5367021e4c6cf091f34434e5e9458&from="
-                + timeFrom +  "&to=" + timeTo;
-        String result = getHTMLrequest(URL);
-        if (!result.equals("")){
+    public void requestResult(String url){
+        String requestResult = getHTMLrequest(url);
+        listForQueue = new ArrayList<>();
+        String[] delimit = null;
+        if (!requestResult.equals("")) {
             String element = null;
-            String[] delimit = result.split("},");
+            delimit = requestResult.split("},");
             for (int i = 0; i < delimit.length; i++) {
                 StringBuilder sb = new StringBuilder();
                 element = delimit[i].replaceAll("}", "");
                 sb = sb.append(element).append("}");
                 element = sb.toString();
-                createClients(element);
+                listForQueue.add(element);
+                listForQueue.add("point");
             }
         }
+        clientsToParce = new ArrayBlockingQueue<>(listForQueue.size(), true, listForQueue);
     }
 
-    public void createClients(String s){
-        if (s != null){
-            JsonParser json = new JsonParser(s);
-//                    System.out.println(json);
-            String phone = phone(json.get("phone").toString());
-            String ref = ref(json.get("ref").toString());
-            String site = site(json.get("site").toString());
-            Client client = new Client(phone, ref, site);
-//                    System.out.println(client);
-            clientsList.add(client);
+    public int numberOfClients(){
+        return clientsToParce.size()/2;
+    }
+
+    public void createClients(){
+        String c;
+        try {
+            while (!(c = clientsToParce.take()).equals("point")) {
+                if (c != null){
+                    JsonParser json = new JsonParser(c);
+                    String phone = phone(json.get("phone").toString());
+                    String ref = ref(json.get("ref").toString());
+                    String site = site(json.get("site").toString());
+                    Client client = new Client(phone, ref, site);
+                    clientsList.add(client);
+                }
+            }
+        }catch (InterruptedException e){
+            e.printStackTrace();
         }
     }
 
@@ -78,7 +92,6 @@ public class GetRequests {
     }
 
     private String site(String s){
-        System.out.println(s);
         String rez = "";
         if (s.contains("petrobani.ru")){
             rez = "http://petrobani.ru/";

@@ -38,7 +38,7 @@ public class Client {
     }
 
     private String time(Date date){
-        SimpleDateFormat time = new SimpleDateFormat("dd.MM.yyyy, hh:mm, a");
+        SimpleDateFormat time = new SimpleDateFormat("dd.MM.yyyy, HH:mm");
         return time.format(date);
     }
 

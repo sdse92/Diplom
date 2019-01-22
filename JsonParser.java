@@ -16,7 +16,7 @@ public class JsonParser {
     }
 
     private void parse(Map m, String s){
-        if (s.startsWith("[")) {//System.out.println("json must start with {");
+        if (s.startsWith("[")) {
             try {
                 throw new inStringException("json must start with {");
             } catch (inStringException e) {
