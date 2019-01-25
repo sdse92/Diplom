@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -10,6 +11,7 @@ public class Timer {
 
     private long timeFrom = 1544515200;
     private long timeTo = 1544518800;
+    private String getRequestResult = null;
 
     public long getTimeFrom() {
         return timeFrom;
@@ -31,9 +33,17 @@ public class Timer {
         while (true){
 
             System.out.println(getTimeFrom() + " " + getTimeTo());
+            Connect connector = new Connect();
+            try {
+                getRequestResult =  connector.getHTMLrequest("http://new.welcome-tracker.ru/api.php?api=71e5367021e4c6cf091f34434e5e9458&from="
+                        + getTimeFrom() +  "&to=" + getTimeTo());
+            } catch (IOException e) {
+                waitToUptime();
+                increaseTimeForRequest();
+                start();
+            }
             GetRequests get = new GetRequests();
-            get.requestResult("http://new.welcome-tracker.ru/api.php?api=71e5367021e4c6cf091f34434e5e9458&from="
-                    + getTimeFrom() +  "&to=" + getTimeTo());
+            get.requestResult(getRequestResult);
 
             int processCount = Runtime.getRuntime().availableProcessors();
             List<Thread> threads = new ArrayList<>();
@@ -60,6 +70,7 @@ public class Timer {
             SetRequests set = new SetRequests(get);
             set.createJSON();
             set.printJson();
+            set.send();
             setTimeTo(getTimeTo() - 3600);
             setTimeFrom(getTimeFrom() - 3600);
             try {
@@ -68,5 +79,27 @@ public class Timer {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void waitToUptime(){
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void increaseTime(){
+        setTimeTo(getTimeTo() + 3600);
+        setTimeFrom(getTimeFrom() + 3600);
+    }
+
+    private void decreaseTime(){
+        setTimeTo(getTimeTo() - 3600);
+        setTimeFrom(getTimeFrom() - 3600);
+    }
+
+    private void increaseTimeForRequest(){
+        setTimeTo(getTimeTo() - 3600);
     }
 }

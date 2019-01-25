@@ -50,7 +50,8 @@ public class JsonParser {
         StringBuffer sb = new StringBuffer("{");
         while (it.hasNext()){
             Map.Entry entry = (Map.Entry) it.next();
-            sb.append("\"").append(entry.getKey()).append("\"").append(":").append("\"").append(entry.getValue()).append("\"");
+            sb.append("\\").append("\"").append(entry.getKey()).append("\\").append("\"").append(":")
+                    .append("\\").append("\"").append(entry.getValue()).append("\\").append("\"");
             if (it.hasNext()) sb.append(",");
             it.remove();
         }
