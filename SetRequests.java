@@ -36,8 +36,9 @@ public class SetRequests {
         String s = jsonObjects.toString();
         byte [] encodeURL = Base64.getEncoder().encode("1843:h29J460ED3uOmC-IlgFcgUj7mnd0s_Rw".getBytes());
         String siteKey = new String(encodeURL);
+//        s = siteKey + s;
         System.out.println(siteKey);
-//        URL url = null;
+        URL url = null;
 //        try {
 //            url = new URL("https://api.myfreshcloud.com/companies/ " + siteKey);
 //            HttpURLConnection con = (HttpURLConnection) url.openConnection();

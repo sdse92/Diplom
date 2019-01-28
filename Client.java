@@ -22,6 +22,13 @@ public class Client {
         this.time = time(date);
     }
 
+    public Client(String phoneFirst, String phoneSecond, String ref, String site, String time) {
+
+    }
+
+    public Client(String phoneFirst, String phoneSecond) {
+    }
+
     public String getPhoneFirst() {
         return phoneFirst;
     }
@@ -57,4 +64,6 @@ public class Client {
     public String getTime() {
         return time;
     }
+
+
 }
