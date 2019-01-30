@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -33,17 +34,30 @@ public class Timer {
         while (true){
 
             System.out.println(getTimeFrom() + " " + getTimeTo());
+            ExceptionLogger exception = new ExceptionLogger();
+            exception.create();
             Connect connector = new Connect();
+
+            GetRequests get = new GetRequests();
             try {
-                getRequestResult =  connector.getHTMLrequest("http://new.welcome-tracker.ru/api.php?api=71e5367021e4c6cf091f34434e5e9458&from="
-                        + getTimeFrom() +  "&to=" + getTimeTo());
+                getRequestResult = get.getHTMLrequest(connector.connectApiFrom("http://new.welcome-tracker.ru/api.php?api=71e5367021e4c6cf091f34434e5e9458&from="
+                        + getTimeFrom() +  "&to=" + getTimeTo()));
             } catch (IOException e) {
-                waitToUptime();
+                exception.write(e.toString());
+                try {
+                    waitToUptime();
+                } catch (InterruptedException e1) {
+                    exception.write(e1.toString());
+                }
                 increaseTimeForRequest();
                 start();
             }
-            GetRequests get = new GetRequests();
             get.requestResult(getRequestResult);
+            try {
+                get.setDbConnection(connector.connectDB());
+            } catch (SQLException e) {
+                exception.write(e.toString());
+            }
 
             int processCount = Runtime.getRuntime().availableProcessors();
             List<Thread> threads = new ArrayList<>();
@@ -63,12 +77,23 @@ public class Timer {
                 try {
                     threads.get(i).join();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    exception.write(e.toString());
                 }
             }
 
-            SetRequests set = new SetRequests(get);
-            set.createJSON();
+            try {
+                get.pushToDB();
+            } catch (SQLException e) {
+                exception.write(e.toString());
+            }
+
+            SetRequests set = null;
+            try {
+                set = new SetRequests(connector.connectDB());
+                set.createJSON();
+            } catch (SQLException e) {
+                exception.write(e.toString());
+            }
             set.printJson();
             set.send();
             setTimeTo(getTimeTo() - 3600);
@@ -76,17 +101,13 @@ public class Timer {
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                exception.write(e.toString());
             }
         }
     }
 
-    private void waitToUptime(){
-        try {
+    private void waitToUptime() throws InterruptedException {
             Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     private void increaseTime(){

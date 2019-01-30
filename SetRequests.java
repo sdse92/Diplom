@@ -4,20 +4,22 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 
 public class SetRequests {
 
     private ArrayList<String> jsonObjects = new ArrayList<>();
-    GetRequests getR;
+    ClientDao dbConnect;
 
-    public SetRequests(GetRequests getR) {
-        this.getR = getR;
+    public SetRequests(ClientDao dbConnect) {
+        this.dbConnect = dbConnect;
     }
 
-    public void createJSON(){
-        ArrayList<Client> clients = getR.getClientsList();
+    public void createJSON() throws SQLException {
+        List<Client> clients = dbConnect.getAll();
         for (Client c : clients){
             JsonParser json = new JsonParser();
             json.put("name","ВК-ТРЕКЕР тест");
@@ -29,6 +31,7 @@ public class SetRequests {
             json.put("url", c.getRef());
 
             jsonObjects.add(json.toString());
+            dbConnect.delete();
         }
     }
 
@@ -37,7 +40,6 @@ public class SetRequests {
         byte [] encodeURL = Base64.getEncoder().encode("1843:h29J460ED3uOmC-IlgFcgUj7mnd0s_Rw".getBytes());
         String siteKey = new String(encodeURL);
 //        s = siteKey + s;
-        System.out.println(siteKey);
         URL url = null;
 //        try {
 //            url = new URL("https://api.myfreshcloud.com/companies/ " + siteKey);

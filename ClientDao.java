@@ -19,7 +19,7 @@ public class ClientDao implements DAO<Client>{
             DriverManager.registerDriver (new JDBC());
             Statement statement = connection.createStatement();
             int row = statement.executeUpdate(sql);
-            System.out.println(row);
+//            System.out.println(row);
         } catch (SQLException e) {
             //e.printStackTrace();
             System.out.println(e);
@@ -27,10 +27,10 @@ public class ClientDao implements DAO<Client>{
     }
 
     @Override
-    public void add(Client client) {
+    public void add(Client client) throws SQLException {
         String sql = "INSERT INTO Client (phoneFirst, phoneSecond, ref, site, time) VALUES (?, ?, ?, ?, ?);";
         PreparedStatement statement = null;
-        try {
+            System.out.println(client);
             statement = connection.prepareStatement(sql);
             statement.setString(1, client.getPhoneFirst());
             statement.setString(2, client.getPhoneSecond());
@@ -39,39 +39,28 @@ public class ClientDao implements DAO<Client>{
             statement.setString(5, client.getTime());
             int row = statement.executeUpdate();
             System.out.println(row);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
-    public void delete() {
-        String sql = "DELETE * FROM Client;";
+    public void delete() throws SQLException {
+        String sql = "DELETE FROM Client;";
         PreparedStatement statement = null;
-        try {
-            statement = connection.prepareStatement(sql);
-//            statement.setInt(1, id);
-            int row = statement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        statement = connection.prepareStatement(sql);
+        int row = statement.executeUpdate();
+        System.out.println(row);
     }
 
     @Override
-    public List<Client> getAll() {
+    public List<Client> getAll() throws SQLException {
         String sql = "SELECT * FROM Client;";
         List<Client> clients = new ArrayList<>();
         PreparedStatement statement = null;
-        try {
             statement = connection.prepareStatement(sql);
             ResultSet resultSet = statement.executeQuery();
             for(int i = 0; resultSet.next(); i++){
                 clients.add(new Client(resultSet.getString("phoneFirst"), resultSet.getString("phoneSecond"),
                         resultSet.getString("ref"), resultSet.getString("site"), resultSet.getString("time")));
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
         return clients;
     }
 }
