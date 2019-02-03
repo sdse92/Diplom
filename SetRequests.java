@@ -20,6 +20,7 @@ public class SetRequests {
 
     public void createJSON() throws SQLException {
         List<Client> clients = dbConnect.getAll();
+        System.out.println(clients);
         for (Client c : clients){
             JsonParser json = new JsonParser();
             json.put("name","ВК-ТРЕКЕР тест");

@@ -23,7 +23,11 @@ public class Client {
     }
 
     public Client(String phoneFirst, String phoneSecond, String ref, String site, String time) {
-
+        this.phoneFirst = phoneFirst;
+        this.phoneSecond = phoneSecond;
+        this.ref = ref;
+        this.site = site;
+        this.time = time;
     }
 
     public Client(String phoneFirst, String phoneSecond) {

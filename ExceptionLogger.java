@@ -26,7 +26,7 @@ public class ExceptionLogger {
             System.out.println(exception);
             Date date = new Date();
             SimpleDateFormat time = new SimpleDateFormat("dd.MM.yyyy, HH:mm");
-            fWriter = new FileWriter(file);
+            fWriter = new FileWriter(file, true);
             fWriter.write(time.format(date) + "\n" + exception + "\n");
             fWriter.flush();
             fWriter.close();
