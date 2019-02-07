@@ -19,7 +19,6 @@ public class ClientDao implements DAO<Client>{
             DriverManager.registerDriver (new JDBC());
             Statement statement = connection.createStatement();
             int row = statement.executeUpdate(sql);
-//            System.out.println(row);
         } catch (SQLException e) {
             //e.printStackTrace();
             System.out.println(e);
@@ -30,7 +29,6 @@ public class ClientDao implements DAO<Client>{
     public void add(Client client) throws SQLException {
         String sql = "INSERT INTO Client (phoneFirst, phoneSecond, ref, site, time) VALUES (?, ?, ?, ?, ?);";
         PreparedStatement statement = null;
-            System.out.println(client);
             statement = connection.prepareStatement(sql);
             statement.setString(1, client.getPhoneFirst());
             statement.setString(2, client.getPhoneSecond());
@@ -38,7 +36,6 @@ public class ClientDao implements DAO<Client>{
             statement.setString(4, client.getSite());
             statement.setString(5, client.getTime());
             int row = statement.executeUpdate();
-            System.out.println(row);
     }
 
     @Override
@@ -47,7 +44,6 @@ public class ClientDao implements DAO<Client>{
         PreparedStatement statement = null;
         statement = connection.prepareStatement(sql);
         int row = statement.executeUpdate();
-        System.out.println(row);
     }
 
     @Override

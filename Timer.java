@@ -40,8 +40,11 @@ public class Timer {
 
             GetRequests get = new GetRequests();
             try {
-                getRequestResult = get.getHTMLrequest(connector.connectApiFrom("http://new.welcome-tracker.ru/api.php?api=71e5367021e4c6cf091f34434e5e9458&from="
-                        + getTimeFrom() +  "&to=" + getTimeTo()));
+//                getRequestResult = get.getHTMLrequest(connector.connectApiFrom("http://new.welcome-tracker.ru/api.php?api=71e5367021e4c6cf091f34434e5e9458&from="
+//                        + getTimeFrom() +  "&to=" + getTimeTo()));
+                getRequestResult = get.getHTMLrequest(connector
+                        .connectApiFrom("http://new.welcome-tracker.ru/api.php?api=71e5367021e4c6cf091f34434e5e9458&from=1544508000"
+                                +  "&to=1544518800"));
             } catch (IOException e) {
                 exception.write(e.toString());
                 try {
@@ -52,6 +55,18 @@ public class Timer {
                 increaseTimeForRequest();
                 start();
             }
+
+            System.out.println("req " + getRequestResult);
+            if (getRequestResult.equals("")){
+                try {
+                    waitToUptime();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                increaseTimeForRequest();
+                start();
+            }
+
             get.requestResult(getRequestResult);
             try {
                 get.setDbConnection(connector.connectDB());
@@ -91,15 +106,16 @@ public class Timer {
             try {
                 set = new SetRequests(connector.connectDB());
                 set.createJSON();
-            } catch (SQLException e) {
+//                set.printJson();
+                set.send();
+            } catch (SQLException | IOException e) {
                 exception.write(e.toString());
             }
-            set.printJson();
-            set.send();
+
             setTimeTo(getTimeTo() - 3600);
             setTimeFrom(getTimeFrom() - 3600);
             try {
-                Thread.sleep(2000);
+                Thread.sleep(10000);
             } catch (InterruptedException e) {
                 exception.write(e.toString());
             }
@@ -116,11 +132,17 @@ public class Timer {
     }
 
     private void decreaseTime(){
+        //уменшение на час, тест
         setTimeTo(getTimeTo() - 3600);
         setTimeFrom(getTimeFrom() - 3600);
+        //уменьшение на день, тест
     }
 
     private void increaseTimeForRequest(){
-        setTimeTo(getTimeTo() - 3600);
+//        setTimeTo(getTimeTo() + 3600);
+        //уменшение на час, тест
+        setTimeFrom(getTimeFrom() - 3600);
+        //уменшение на день, тест
+//        setTimeTo(getTimeFrom() - 86400);
     }
 }

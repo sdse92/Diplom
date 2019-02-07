@@ -31,6 +31,7 @@ public class JsonParser {
                 int delimiter = elementsArr[i].indexOf(":");
                 String key = elementsArr[i].substring(0, delimiter).replaceAll("\"", "");
                 String value = elementsArr[i].substring(delimiter + 1).replaceAll("\"", "");
+                System.out.println(value);
                 m.put(key, value);
             }
         }

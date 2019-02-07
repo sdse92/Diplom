@@ -83,6 +83,7 @@ public class GetRequests {
     }
 
     private String phone(String s){
+        System.out.println(s);
         String rez = s.replaceAll("pP","").replaceAll("\\D","");
         if (rez.length() < 11){
             rez = "";

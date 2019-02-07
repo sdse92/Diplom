@@ -49,7 +49,7 @@ public class Client {
     }
 
     private String time(Date date){
-        SimpleDateFormat time = new SimpleDateFormat("dd.MM.yyyy, HH:mm");
+        SimpleDateFormat time = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS");
         return time.format(date);
     }
 
