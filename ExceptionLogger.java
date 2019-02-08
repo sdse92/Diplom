@@ -11,8 +11,6 @@ public class ExceptionLogger {
     FileWriter fWriter;
 
     public void create(){
-        filePath = new File("C:/Users/SD/IdeaProjects/ApiConnector/src/errors");
-        filePath.mkdir();
         file = new File("exceptions.txt");
         try {
             file.createNewFile();

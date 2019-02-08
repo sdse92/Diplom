@@ -24,14 +24,12 @@ public class JsonParser {
             }
         }
         else {
-            System.out.println(s);
             String string = s.substring(1, s.length()-1);
-            String[] elementsArr = string.split(",");
+            String[] elementsArr = string.split(",\"");
             for (int i = 0; i < elementsArr.length; i++){
                 int delimiter = elementsArr[i].indexOf(":");
                 String key = elementsArr[i].substring(0, delimiter).replaceAll("\"", "");
                 String value = elementsArr[i].substring(delimiter + 1).replaceAll("\"", "");
-                System.out.println(value);
                 m.put(key, value);
             }
         }
@@ -51,10 +49,19 @@ public class JsonParser {
         StringBuffer sb = new StringBuffer("{");
         while (it.hasNext()){
             Map.Entry entry = (Map.Entry) it.next();
-            sb.append("\\").append("\"").append(entry.getKey()).append("\\").append("\"").append(":")
-                    .append("\\").append("\"").append(entry.getValue()).append("\\").append("\"");
-            if (it.hasNext()) sb.append(",");
-            it.remove();
+            String key = (String) entry.getKey();
+            String val = (String) entry.getValue();
+            if (val.startsWith("[{") || key.startsWith("type")){
+                sb.append("\\").append("\"").append(entry.getKey()).append("\\").append("\"").append(":")
+                        .append(entry.getValue());
+                if (it.hasNext()) sb.append(",");
+                it.remove();
+            }else {
+                sb.append("\\").append("\"").append(entry.getKey()).append("\\").append("\"").append(":")
+                        .append("\\").append("\"").append(entry.getValue()).append("\\").append("\"");
+                if (it.hasNext()) sb.append(",");
+                it.remove();
+            }
         }
         sb.append("}");
         return sb.toString();

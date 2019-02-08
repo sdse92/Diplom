@@ -1,3 +1,10 @@
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -8,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /*класс принимает JSON строку, разбивает ее на подстроки с информацией об отдельном клиенте
 * добавляет эти подстроки в лист listForQueue
@@ -20,21 +28,23 @@ import java.util.concurrent.BlockingQueue;
 
 public class GetRequests {
 
-    List<Client> clients = new ArrayList<>();
+    List<Client> clients = new CopyOnWriteArrayList<>();
     BlockingQueue<String> clientsToParce;
     List<String> listForQueue;
     ClientDao dbConnection;
 
-    public String getHTMLrequest(HttpURLConnection conn) throws IOException {
-        String line;
-        String result = "";
-        conn.setRequestMethod("GET");
-        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        while ((line = rd.readLine()) != null) {
-            result += line;
+    public String getAPIRequest(String uml) throws IOException {
+        HttpClient client = HttpClientBuilder.create().disableContentCompression().build();
+        HttpPost request = new HttpPost(uml);
+        HttpResponse response = client.execute(request);
+        HttpEntity httpEntity = response.getEntity();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(httpEntity.getContent(), "utf-8"));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line + "\n");
         }
-        rd.close();
-        return result.replaceAll("\\[","").replaceAll("]","");
+        return sb.toString().replaceAll("\\[","").replaceAll("]","");
     }
 
     public void requestResult(String result){
@@ -51,6 +61,7 @@ public class GetRequests {
                 listForQueue.add(element);
                 listForQueue.add("point");
             }
+
         }
         clientsToParce = new ArrayBlockingQueue<>(listForQueue.size(), true, listForQueue);
     }
@@ -74,7 +85,7 @@ public class GetRequests {
                     String site = site(json.get("site").toString());
                     Client client = new Client(phone, ref, site);
                     clients.add(client);
-
+                    System.out.println("cli " + client);
                 }
             }
         }catch (InterruptedException e){
@@ -83,7 +94,6 @@ public class GetRequests {
     }
 
     private String phone(String s){
-        System.out.println(s);
         String rez = s.replaceAll("pP","").replaceAll("\\D","");
         if (rez.length() < 11){
             rez = "";

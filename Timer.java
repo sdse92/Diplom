@@ -40,11 +40,11 @@ public class Timer {
 
             GetRequests get = new GetRequests();
             try {
-//                getRequestResult = get.getHTMLrequest(connector.connectApiFrom("http://new.welcome-tracker.ru/api.php?api=71e5367021e4c6cf091f34434e5e9458&from="
-//                        + getTimeFrom() +  "&to=" + getTimeTo()));
-                getRequestResult = get.getHTMLrequest(connector
-                        .connectApiFrom("http://new.welcome-tracker.ru/api.php?api=71e5367021e4c6cf091f34434e5e9458&from=1544508000"
-                                +  "&to=1544518800"));
+                getRequestResult = get.getAPIRequest("http://new.welcome-tracker.ru/api.php?api=71e5367021e4c6cf091f34434e5e9458&from="
+                        + getTimeFrom() +  "&to=" + getTimeTo());
+
+//                getRequestResult = get.getAPIRequest("http://new.welcome-tracker.ru/api.php?api=71e5367021e4c6cf091f34434e5e9458&from=1544508000"
+//                                +  "&to=1544518800");
             } catch (IOException e) {
                 exception.write(e.toString());
                 try {
@@ -56,12 +56,11 @@ public class Timer {
                 start();
             }
 
-            System.out.println("req " + getRequestResult);
             if (getRequestResult.equals("")){
                 try {
                     waitToUptime();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    exception.write(e.toString());
                 }
                 increaseTimeForRequest();
                 start();
@@ -76,10 +75,9 @@ public class Timer {
 
             int processCount = Runtime.getRuntime().availableProcessors();
             List<Thread> threads = new ArrayList<>();
-            int threadCount;
-            if (get.numberOfClients() > processCount){ threadCount = processCount; }
-            else { threadCount = get.numberOfClients(); }
-
+            int threadCount = get.numberOfClients();
+//            if (get.numberOfClients() > processCount){ threadCount = processCount; }
+//            else { threadCount = get.numberOfClients(); }
             for (int i = 0; i < threadCount; i++){
                 threads.add(new Thread(new ThreadParser(get)));
             }
@@ -107,7 +105,7 @@ public class Timer {
                 set = new SetRequests(connector.connectDB());
                 set.createJSON();
 //                set.printJson();
-                set.send();
+                set.sendClient();
             } catch (SQLException | IOException e) {
                 exception.write(e.toString());
             }
@@ -115,7 +113,7 @@ public class Timer {
             setTimeTo(getTimeTo() - 3600);
             setTimeFrom(getTimeFrom() - 3600);
             try {
-                Thread.sleep(10000);
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 exception.write(e.toString());
             }

@@ -13,7 +13,7 @@ public class ClientDao implements DAO<Client>{
 
     public void createTable() {
         String sql = "CREATE TABLE IF NOT EXISTS Client (" +
-                "phoneFirst TEXT PRIMARY KEY NOT NULL, " +
+                "phoneFirst TEXT NOT NULL, " +
                 "phoneSecond TEXT, ref TEXT, site TEXT, time TEXT);";
         try {
             DriverManager.registerDriver (new JDBC());
@@ -28,14 +28,13 @@ public class ClientDao implements DAO<Client>{
     @Override
     public void add(Client client) throws SQLException {
         String sql = "INSERT INTO Client (phoneFirst, phoneSecond, ref, site, time) VALUES (?, ?, ?, ?, ?);";
-        PreparedStatement statement = null;
-            statement = connection.prepareStatement(sql);
-            statement.setString(1, client.getPhoneFirst());
-            statement.setString(2, client.getPhoneSecond());
-            statement.setString(3, client.getRef());
-            statement.setString(4, client.getSite());
-            statement.setString(5, client.getTime());
-            int row = statement.executeUpdate();
+        PreparedStatement statement = connection.prepareStatement(sql);
+        statement.setString(1, client.getPhoneFirst());
+        statement.setString(2, client.getPhoneSecond());
+        statement.setString(3, client.getRef());
+        statement.setString(4, client.getSite());
+        statement.setString(5, client.getTime());
+        int row = statement.executeUpdate();
     }
 
     @Override
