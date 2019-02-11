@@ -46,12 +46,12 @@ public class JsonParser {
     @Override
     public String toString() {
         Iterator it = element.entrySet().iterator();
-        StringBuffer sb = new StringBuffer("{");
+        StringBuffer sb = new StringBuffer("\"{");
         while (it.hasNext()){
             Map.Entry entry = (Map.Entry) it.next();
             String key = (String) entry.getKey();
             String val = (String) entry.getValue();
-            if (val.startsWith("[{") || key.startsWith("type")){
+            if (val.startsWith("[{") || key.startsWith("type") || key.startsWith("id")){
                 sb.append("\\").append("\"").append(entry.getKey()).append("\\").append("\"").append(":")
                         .append(entry.getValue());
                 if (it.hasNext()) sb.append(",");
@@ -63,7 +63,7 @@ public class JsonParser {
                 it.remove();
             }
         }
-        sb.append("}");
+        sb.append("}\"");
         return sb.toString();
     }
 

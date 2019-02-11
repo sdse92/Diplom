@@ -1,18 +1,16 @@
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.TimerTask;
+import java.util.*;
 
 public class Timer {
 
-//    private long timeFrom = 1544511600;
+//    private long timeFrom = 1544515200;
 //    private long timeTo = 1544518800;
-
-    private long timeFrom = 1544515200;
-    private long timeTo = 1544518800;
     private String getRequestResult = null;
+
+    private long timeTo = Calendar.getInstance(TimeZone.getTimeZone("GMT-0")).getTime().getTime()/1000;
+//    private long timeFrom = timeTo - 60;
+    private long timeFrom = timeTo - 1800;
 
     public long getTimeFrom() {
         return timeFrom;
@@ -33,7 +31,7 @@ public class Timer {
     public void start(){
         while (true){
 
-            System.out.println(getTimeFrom() + " " + getTimeTo());
+            System.out.println("\n" + getTimeFrom() + " " + getTimeTo());
             ExceptionLogger exception = new ExceptionLogger();
             exception.create();
             Connect connector = new Connect();
@@ -56,7 +54,7 @@ public class Timer {
                 start();
             }
 
-            if (getRequestResult.equals("")){
+            if (getRequestResult.length() < 2){
                 try {
                     waitToUptime();
                 } catch (InterruptedException e) {
@@ -73,11 +71,8 @@ public class Timer {
                 exception.write(e.toString());
             }
 
-            int processCount = Runtime.getRuntime().availableProcessors();
             List<Thread> threads = new ArrayList<>();
             int threadCount = get.numberOfClients();
-//            if (get.numberOfClients() > processCount){ threadCount = processCount; }
-//            else { threadCount = get.numberOfClients(); }
             for (int i = 0; i < threadCount; i++){
                 threads.add(new Thread(new ThreadParser(get)));
             }
@@ -104,16 +99,21 @@ public class Timer {
             try {
                 set = new SetRequests(connector.connectDB());
                 set.createJSON();
-//                set.printJson();
                 set.sendClient();
+//                set.getClientId();
+//                set.createJsonToDeal();
+//                set.createDeal();
             } catch (SQLException | IOException e) {
                 exception.write(e.toString());
             }
 
-            setTimeTo(getTimeTo() - 3600);
-            setTimeFrom(getTimeFrom() - 3600);
+            setTimeTo(getTimeTo() - 20);
+            setTimeFrom(getTimeFrom() - 20);
+
+//            setTimeFrom(getTimeTo());
+//            setTimeTo(getTimeTo() + 60);
             try {
-                Thread.sleep(2000);
+                Thread.sleep(4000);
             } catch (InterruptedException e) {
                 exception.write(e.toString());
             }

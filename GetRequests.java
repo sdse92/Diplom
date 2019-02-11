@@ -85,7 +85,6 @@ public class GetRequests {
                     String site = site(json.get("site").toString());
                     Client client = new Client(phone, ref, site);
                     clients.add(client);
-                    System.out.println("cli " + client);
                 }
             }
         }catch (InterruptedException e){
