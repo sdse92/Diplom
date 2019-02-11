@@ -4,13 +4,11 @@ import java.util.*;
 
 public class Timer {
 
-//    private long timeFrom = 1544515200;
-//    private long timeTo = 1544518800;
     private String getRequestResult = null;
 
     private long timeTo = Calendar.getInstance(TimeZone.getTimeZone("GMT-0")).getTime().getTime()/1000;
 //    private long timeFrom = timeTo - 60;
-    private long timeFrom = timeTo - 1800;
+    private long timeFrom = timeTo - 3600;
 
     public long getTimeFrom() {
         return timeFrom;
@@ -60,7 +58,13 @@ public class Timer {
                 } catch (InterruptedException e) {
                     exception.write(e.toString());
                 }
-                increaseTimeForRequest();
+//                increaseTime();
+                decreaseTime();
+                try {
+                    waitToUptime();
+                } catch (InterruptedException e) {
+                    exception.write(e.toString());
+                }
                 start();
             }
 
@@ -121,7 +125,7 @@ public class Timer {
     }
 
     private void waitToUptime() throws InterruptedException {
-            Thread.sleep(2000);
+            Thread.sleep(4000);
     }
 
     private void increaseTime(){
